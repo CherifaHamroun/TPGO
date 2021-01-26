@@ -2,6 +2,10 @@ import numpy as np
 import math
 import networkx as nx
 import matplotlib.pyplot as plt
+import tkinter as tk
+from tkinter import * 
+from tkinter.messagebox import showinfo
+from tkinter import ttk
 def appelant(adjacent, t_decouv, t_arriere, visited, parent, pa, vertex, V,time):
     for i in range(0,V):
         if visited[i] == False:
@@ -33,14 +37,7 @@ class SommetInexistantException(Exception):
 
     def __str__(self):
         return f'{self.adj} -> {self.message}'
-
-if __name__ == "__main__":
-    j = -1
-    print('Veuillez entrer la liste des sommets [!] veuillez laisser un espace entre les noms de vos sommets [!] : ')
-    sommets = input().split()
-    liste_sans = set(sommets)
-    sommets = list(liste_sans)
-    sommets.sort()
+def structuriser(sommets,entrees,fenetre2):
     adjacent = np.zeros(shape=(len(sommets),len(sommets)))
     np.fill_diagonal(adjacent, 1)
     visited = np.array([False]*len(sommets))
@@ -49,13 +46,10 @@ if __name__ == "__main__":
     t_arriere = np.array([math.inf]*len(sommets))
     p_articul = np.array([False]*len(sommets))
     for i in range(0,len(sommets)):
-        print('Veuillez entrer la liste des sommets adjacents a',sommets[i],'[!] veuillez laisser un espace entre les noms de vos sommets [!] : ')
-        adj = input().split()
-        print(adj)
+        adj = entrees[i].get().split()
         liste_sans = set(adj)
         adj = list(liste_sans)
         adj.sort()
-        print(adj)
         if False in np.in1d(adj,sommets):
             raise SommetInexistantException(adj)
         for a in adj:
@@ -74,8 +68,73 @@ if __name__ == "__main__":
                 G.add_edge(sommets[i],sommets[j])
     for node in G:
         if node in pnt:
-            color_map.append("green")
+            color_map.append("#EC6C44")
         else:
-            color_map.append("blue")
-    nx.draw(G,node_color=color_map, with_labels=True)
+            color_map.append("#75E6DA")
+    nx.draw(G,node_color=color_map, with_labels=True,edge_color="#0B6B88")
     plt.show()
+    fenetre2.destroy()
+def recupere(entree,fenetre):
+    fenetre.destroy()
+    sommets = entree.split()
+    liste_sans = set(sommets)
+    sommets = list(liste_sans)
+    sommets.sort()
+    fenetre2 = tk.Tk()
+    fenetre2.geometry("900x700")
+    fenetre2.configure(bg = "#0B6B88")
+    txt = "{str} {val} {warning}"
+    container = ttk.Frame(fenetre2)
+    canvas = tk.Canvas(container,width=770, height=690)
+    scrollbar = ttk.Scrollbar(container, orient="vertical", command=canvas.yview)
+    scrollable_frame = ttk.Frame(canvas,height = 900,width=600)
+    scrollable_frame.bind(
+        "<Configure>",
+        lambda e: canvas.configure(
+            scrollregion=canvas.bbox("all")
+        )
+    )
+    canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+    canvas.configure(yscrollcommand=scrollbar.set)
+    entrees = [0]*len(sommets)
+    for i in range(0,len(sommets)):
+        l = LabelFrame(scrollable_frame, text=txt.format(str = "Veuillez entrer la liste des sommets adjacents a",val = sommets[i],warning="[!] veuillez laisser un espace entre les noms de vos sommets [!] :" ), padx=10, pady=10)
+        l.pack(fill="both", expand="yes")
+        entrees[i] = tk.Entry(l)
+        entrees[i].focus()
+        entrees[i].pack()
+    bouton2=Button(scrollable_frame, text="Valider",command = lambda:structuriser(sommets,entrees,fenetre2),bg="#EC6C44",fg="black")
+    bouton2.pack()
+    container.pack()
+    canvas.pack(side="left", fill="both", expand=True)
+    scrollbar.pack(side="right", fill="y")
+    fenetre2.mainloop()
+def start(openfen):
+    openfen.destroy()
+    fenetre = Tk()
+    fenetre.title("Probleme des points d'articulation")
+    fenetre.geometry("900x700")
+    fenetre.configure(bg = "#EBF4F5")
+    label = Label(fenetre, text="    ",bg="#EBF4F5")
+    label.pack()
+    l = LabelFrame(fenetre, text="Quels sont vos sommets ? [!] veuillez laisser un espace entre les noms de vos sommets [!]", padx=10, pady=10,bg="#EBF4F5",fg="#0B6B88")
+    l.pack(fill="both", expand="yes")
+    e1 = tk.Entry(l)
+    e1.focus()
+    e1.pack()
+    bouton = Button(fenetre, text="Valider", command=lambda:recupere(e1.get(),fenetre),bg="#EC6C44")
+    bouton.pack()
+    fenetre.mainloop()
+if __name__ == "__main__":
+    j = -1
+    openfen = Tk()
+    openfen.title("Probleme des points d'articulation")
+    openfen.geometry("900x700")
+    openfen.configure(bg = "white")
+    background_image=tk.PhotoImage(file="particul.gif",format="gif -index 0")
+    background_label = tk.Label(openfen, image=background_image)
+    background_label.pack()
+    bouton_start = Button(openfen, text="Commencer",command=lambda:start(openfen),bg="#EC6C44")
+    bouton_start.pack()
+    openfen.mainloop()
+    
