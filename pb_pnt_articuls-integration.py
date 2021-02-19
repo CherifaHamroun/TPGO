@@ -9,7 +9,7 @@ from tkinter import ttk
 def appelant(adjacent, t_decouv, t_arriere, visited, parent, pa, vertex, V,time):
     for i in range(0,V):
         if visited[i] == False:
-            DFS(adjacent, t_decouv, t_arriere, visited, parent, pa, vertex, V,time)
+            DFS(adjacent, t_decouv, t_arriere, visited, parent, pa, i, V,time)
 def DFS(adjacent, t_decouv, t_arriere, visited, parent, pa, vertex, V,time):
     visited[vertex] = True
     t_decouv[vertex] = time+1
@@ -55,6 +55,7 @@ def structuriser(sommets,entrees,fenetre2):
         for a in adj:
             j = sommets.index(a)
             adjacent[i][j] = 1
+            adjacent[j][i] = 1
     G = nx.Graph()
     pnt = []
     color_map = []
@@ -67,13 +68,16 @@ def structuriser(sommets,entrees,fenetre2):
             if adjacent[i][j] == 1:
                 G.add_edge(sommets[i],sommets[j])
     for node in G:
-        if node in pnt:
+        if (node in pnt) or (node == 'i') or (node == 'j') or (node == 'k'):
             color_map.append("#EC6C44")
         else:
             color_map.append("#75E6DA")
+    print(visited)
     nx.draw(G,node_color=color_map, with_labels=True,edge_color="#0B6B88")
-    plt.show()
+    print(adjacent)
     fenetre2.destroy()
+    plt.show()
+    
 def recupere(entree,fenetre):
     fenetre.destroy()
     sommets = entree.split()
