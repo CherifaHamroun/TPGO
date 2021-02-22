@@ -32,7 +32,17 @@ def PVC_naive(graph,racine):
         node1 = node
     noeuds.append((node1,0))
     return [min_path,noeuds]
-
+def cycle(final,graph):
+    cy=[]
+    stop = False
+    for elt in final:
+        if elt["i"] not in cy or elt["j"] not in cy:
+            cy.append(elt["i"])
+            cy.append(elt["j"])
+        else :
+            if len(final) != graph.shape[1]:
+                stop = True
+    return stop
 def PVC_kruskal(graph,racine):
     aretes = []
     element = { 
@@ -54,15 +64,22 @@ def PVC_kruskal(graph,racine):
     k = 0
     l = 0
     stop = False
+    inter = []
     while k < len(aretes) and not stop:
-        if degre[aretes[k]["i"]]<2 and degre[aretes[k]["j"]]<2:
+        inter = final.copy()
+        inter.append(aretes[k])
+        print(aretes[k])
+        print(cycle(inter,graph))
+        if degre[aretes[k]["i"]]<2 and degre[aretes[k]["j"]]<2 and not cycle(inter,graph):
             degre[aretes[k]["i"]] = degre[aretes[k]["i"]] + 1
             degre[aretes[k]["j"]] = degre[aretes[k]["j"]] + 1
             final.append(aretes[k])
             l=l+1
-            if l == graph.shape[1]:
+            print(inter)
+        if l == graph.shape[1]:
                 stop = True
         k = k+1
+    print(k)
     cout = 0
     aretes = []
     for elt in final :
